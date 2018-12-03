@@ -48,14 +48,25 @@ class FileRenamer {
     FileRenamer(String... args) throws Exception {
         validateArgs(args);
 
-        this.extension = args[0];
-        this.beforeNames = new String[args.length - 1];
-        this.afterNames = new String[args.length - 1];
+        String optionString = "";
 
-        for (int i = 1; i < args.length; i++) {
-            String[] temp = args[i].split("=");
-            beforeNames[i - 1] = temp[0];
-            afterNames[i - 1] = temp[1];
+        try (BufferedReader br = new BufferedReader(new FileReader(new File(root, "Options.txt")))) {
+            if (br.ready()) {
+                optionString = br.readLine();
+            }
+        }
+
+        String[] options = optionString.split(" ");
+
+        this.extension = args[0];
+        this.beforeNames = new String[options.length];
+        this.afterNames = new String[options.length];
+
+
+        for (int i = 0; i < options.length; i++) {
+            String[] temp = options[i].split("=");
+            beforeNames[i] = temp[0];
+            afterNames[i] = temp[1];
         }
     }
 
@@ -66,10 +77,6 @@ class FileRenamer {
 
         if (!args[0].startsWith(".") || args[0].length() < 2) {
             throw new Exception("The first argument must be the file extension, starting with a period '.' e.g. .java.");
-        }
-
-        if (args.length < 2) {
-            throw new Exception("Please specify class names to be generated.");
         }
     }
 
